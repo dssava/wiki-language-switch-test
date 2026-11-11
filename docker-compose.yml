@@ -1,0 +1,9 @@
+services:
+  tests:
+    build: .
+    # Credentials come from the host's .env at run time; the file is never baked into the image.
+    env_file: .env
+    # The HTML report written in the container appears in ./playwright-report on the host.
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
