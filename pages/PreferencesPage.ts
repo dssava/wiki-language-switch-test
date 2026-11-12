@@ -5,7 +5,7 @@ export class PreferencesPage extends BasePage {
   protected readonly path = '/wiki/Special:Preferences';
 
   private readonly userProfileTab: Locator;
-  private readonly languageInput: Locator;
+  private readonly languageSelect: Locator;
   private readonly saveButton: Locator;
 
   /** Page title (<h1>); its text depends on the interface language. */
@@ -15,9 +15,8 @@ export class PreferencesPage extends BasePage {
     super(page);
     // Locators are language-independent: tab names change with the interface language.
     this.userProfileTab = page.getByRole('tab').first();
-    this.languageInput = page
-      .locator('.mw-htmlform-field-HTMLSelectLanguageField')
-      .getByRole('combobox');
+    // The real form field (a <select>); the visible dropdown is only a wrapper around it.
+    this.languageSelect = page.locator('#mw-input-wplanguage');
     this.saveButton = page.locator('#prefcontrol button');
     this.heading = page.locator('h1').first();
   }
@@ -26,11 +25,10 @@ export class PreferencesPage extends BasePage {
     await this.userProfileTab.click();
   }
 
-  /** Picks an interface language by its code. List items look like "en · English". */
+  /** Picks an interface language by its code, e.g. "en". */
   async selectLanguage(code: string): Promise<void> {
-    await this.languageInput.click();
-    await this.languageInput.fill(code);
-    await this.page.getByRole('option', { name: new RegExp(`^${code} ·`) }).first().click();
+    // force: the <select> is hidden behind the custom dropdown, so skip the visibility check.
+    await this.languageSelect.selectOption(code, { force: true });
   }
 
   async save(): Promise<void> {
