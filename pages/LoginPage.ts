@@ -27,17 +27,8 @@ export class LoginPage extends BasePage {
     await this.passwordInput.fill(password);
     await this.loginButton.click();
 
-    // Success = we are back on the wiki domain. Otherwise report the site's own error text.
-    try {
-      await this.page.waitForURL((url) => url.hostname.endsWith('wikipedia.org'), { timeout: 15_000 });
-    } catch {
-      const message = (await this.errorMessage.allInnerTexts()).join(' ').trim();
-      throw new Error(`Login failed. Site message: ${message || 'none'}`);
-    }
-
-    // The session is established once MediaWiki reports the current user name on the page.
-    await this.page.waitForFunction(
-      () => Boolean((window as any).mw?.config?.get('wgUserName')),
-    );
+    // Wait until we are back on the wiki and the site knows who is logged in.
+    await this.page.waitForURL(/pl\.wikipedia\.org/);
+    await this.page.waitForFunction("!!window.mw?.config.get('wgUserName')");
   }
 }

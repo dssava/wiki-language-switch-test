@@ -10,14 +10,13 @@ test.describe('TC-001: interface language switch', () => {
     await loginPage.login(env.username, env.password);
   });
 
-  // Postcondition: always return the account to Ukrainian, even if the test fails.
-  test.afterEach(async ({ preferencesPage }) => {
-    await preferencesPage.restoreLanguage(DEFAULT_LANGUAGE.code);
-  });
-
   test('authorized user can change the interface language', async ({ preferencesPage }) => {
     await preferencesPage.changeLanguage(NEW_LANGUAGE.code);
 
     await expect(preferencesPage.heading).toHaveText(NEW_LANGUAGE.heading);
+  });
+
+  test.afterEach(async ({ preferencesPage }) => {
+    await preferencesPage.restoreLanguage(DEFAULT_LANGUAGE.code);
   });
 });
